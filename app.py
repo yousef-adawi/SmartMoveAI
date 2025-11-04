@@ -37,6 +37,10 @@ st.markdown("""
         margin: 10px 0;
         border-left: 4px solid #4caf50;
     }
+    /* إخفاء زر الـ form الافتراضي */
+    .stForm {
+        border: none;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -112,27 +116,7 @@ with st.sidebar:
 if "history" not in st.session_state:
     st.session_state.history = []
 
-# --- نموذج الإدخال ---
-with st.form("user_input", clear_on_submit=True):
-    col1, col2 = st.columns([4, 1])
-    
-    with col1:
-        user_text = st.text_area(
-            "💬 اكتب سؤالك:",
-            height=120,
-            placeholder="مثال: كيف أقدم طلب لم شمل في هولندا؟\nمثال: ما هي شروط تأشيرة العمل في ألمانيا؟",
-            label_visibility="collapsed"
-        )
-    
-    with col2:
-        st.write("")  # مسافة
-        submitted = st.form_submit_button("📤 إرسال", use_container_width=True, type="primary")
-        
-        # أمثلة سريعة
-        if st.form_submit_button("💡 مثال", use_container_width=True):
-            user_text = "كيف أقدم طلب لم شمل في هولندا؟"
-
-# --- دالة استدعاء OpenAI (محدثة) ---
+# --- دالة استدعاء OpenAI ---
 def call_openai(messages: List[Dict[str, str]], model_name: str) -> str:
     """استدعاء OpenAI API بالطريقة الجديدة"""
     try:
@@ -187,33 +171,12 @@ Important:
     except Exception as e:
         return f"❌ حدث خطأ: {str(e)}\n\nتأكد من صحة مفتاح API في الإعدادات."
 
-# --- معالجة الإرسال ---
-if submitted and user_text.strip():
-    # إضافة سؤال المستخدم
-    st.session_state.history.append({
-        "role": "user",
-        "content": user_text.strip()
-    })
-    
-    # عرض مؤشر التحميل
-    with st.spinner("🤔 جاري التفكير..."):
-        # استدعاء OpenAI
-        answer = call_openai(st.session_state.history, model)
-        
-        # إضافة الإجابة
-        st.session_state.history.append({
-            "role": "assistant",
-            "content": answer
-        })
-    
-    # إعادة تحميل الصفحة لعرض الرد
-    st.rerun()
-
-# --- عرض المحادثة ---
+# --- عرض المحادثة في الأعلى ---
 if st.session_state.history:
     st.markdown("---")
     st.subheader("💬 سجل المحادثة")
     
+    # عرض المحادثات (الأحدث في الأسفل)
     for i, msg in enumerate(st.session_state.history):
         if msg["role"] == "user":
             st.markdown(f"""
@@ -230,14 +193,9 @@ if st.session_state.history:
             </div>
             """, unsafe_allow_html=True)
     
-    # زر مسح المحادثة
-    col1, col2, col3 = st.columns([1, 1, 2])
-    with col1:
-        if st.button("🗑️ مسح المحادثة", use_container_width=True):
-            st.session_state.history = []
-            st.rerun()
+    st.markdown("---")
 else:
-    # رسائل ترحيبية
+    # رسائل ترحيبية فقط عند البداية
     st.info("👋 مرحباً! اسألني أي سؤال عن الهجرة، التأشيرات، أو الإجراءات القانونية")
     
     # أمثلة مقترحة
@@ -258,6 +216,52 @@ else:
         - 💰 ما هي تكاليف طلب اللجوء؟
         - 🎓 كيف أحصل على فيزا دراسية؟
         """)
+    
+    st.markdown("---")
+
+# --- نموذج الإدخال (دائماً في الأسفل) ---
+st.markdown("### ✍️ اكتب سؤالك:")
+
+with st.form("user_input", clear_on_submit=True):
+    user_text = st.text_area(
+        "اكتب سؤالك هنا",
+        height=100,
+        placeholder="مثال: كيف أقدم طلب لم شمل في هولندا؟",
+        label_visibility="collapsed"
+    )
+    
+    col1, col2, col3 = st.columns([2, 1, 1])
+    with col1:
+        submitted = st.form_submit_button("📤 إرسال", use_container_width=True, type="primary")
+    with col2:
+        clear_btn = st.form_submit_button("🗑️ مسح المحادثة", use_container_width=True)
+
+# --- معالجة زر المسح ---
+if clear_btn:
+    st.session_state.history = []
+    st.rerun()
+
+# --- معالجة الإرسال ---
+if submitted and user_text.strip():
+    # إضافة سؤال المستخدم
+    st.session_state.history.append({
+        "role": "user",
+        "content": user_text.strip()
+    })
+    
+    # عرض مؤشر التحميل
+    with st.spinner("🤔 جاري التفكير..."):
+        # استدعاء OpenAI
+        answer = call_openai(st.session_state.history, model)
+        
+        # إضافة الإجابة
+        st.session_state.history.append({
+            "role": "assistant",
+            "content": answer
+        })
+    
+    # إعادة تحميل لعرض الإجابة الجديدة
+    st.rerun()
 
 # --- Footer ---
 st.markdown("---")
