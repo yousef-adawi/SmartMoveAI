@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartMoveAI — حلول ذكاء اصطناعي عملية للشركات</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Tajawal', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            direction: rtl;
+        }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 100px 20px;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 3em;
+            font-weight: 900;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .hero p {
+            font-size: 1.3em;
+            margin-bottom: 40px;
+            opacity: 0.95;
+        }
+        
+        .cta-primary {
+            background: white;
+            color: #667eea;
+            padding: 18px 50px;
+            font-size: 1.2em;
+            font-weight: 700;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 10px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .cta-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .cta-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+            padding: 16px 40px;
+            font-size: 1.1em;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .cta-secondary:hover {
+            background: white;
+            color: #667eea;
+        }
+        
+        /* Features Section */
+        .features {
+            padding: 80px 20px;
+            background: #f8f9fa;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 60px;
+            color: #2c3e50;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 40px;
+        }
+        
+        .feature-card {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 15px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.2);
+        }
+        
+        .feature-icon {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+        }
+        
+        .feature-card h3 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+        
+        .feature-card p {
+            color: #666;
+            line-height: 1.8;
+        }
+        
+        /* Pricing Section */
+        .pricing {
+            padding: 80px 20px;
+            background: white;
+        }
+        
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+        
+        .pricing-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .pricing-card:hover {
+            transform: scale(1.05);
+            border-color: #667eea;
+            box-shadow: 0 20px 50px rgba(102, 126, 234, 0.15);
+        }
+        
+        .pricing-card.featured {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            transform: scale(1.08);
+        }
+        
+        .pricing-card.featured h3,
+        .pricing-card.featured .price {
+            color: white;
+        }
+        
+        .plan-name {
+            font-size: 1.8em;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        .price {
+            font-size: 3em;
+            font-weight: 900;
+            color: #667eea;
+            margin: 20px 0;
+        }
+        
+        .price-period {
+            font-size: 0.4em;
+            font-weight: 400;
+        }
+        
+        .features-list {
+            list-style: none;
+            margin: 30px 0;
+            text-align: right;
+        }
+        
+        .features-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .features-list li:before {
+            content: "✓ ";
+            color: #4caf50;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .pricing-card.featured .features-list li {
+            border-bottom-color: rgba(255,255,255,0.2);
+        }
+        
+        .pricing-card.featured .features-list li:before {
+            color: #fff;
+        }
+        
+        /* Sign Up Form */
+        .signup {
+            padding: 80px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .signup-form {
+            max-width: 600px;
+            margin: 40px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            text-align: right;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            font-family: 'Tajawal', sans-serif;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: flex-start;
+            flex-direction: row-reverse;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 18px;
+            width: 100%;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-3px);
+        }
+        
+        /* Footer */
+        footer {
+            background: #2c3e50;
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        
+        .footer-links {
+            margin: 20px 0;
+        }
+        
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: #667eea;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2em;
+            }
+            
+            .hero p {
+                font-size: 1.1em;
+            }
+            
+            .section-title {
+                font-size: 1.8em;
+            }
+            
+            .pricing-card.featured {
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>SmartMoveAI</h1>
+            <h2 style="font-size: 2em; margin-bottom: 20px;">حلول ذكاء اصطناعي عملية للشركات والمؤسسات</h2>
+            <p>حوّل بياناتك إلى قرارات ذكية وأتمتة مهامك بسهولة</p>
+            <p style="font-size: 1.1em; margin-bottom: 40px;">تقارير ذكية، أتمتة عملية، ونماذج AI جاهزة للاستخدام — بدون تعقيد تقني</p>
+            
+            <a href="#signup" class="cta-primary">ابدأ التجربة المجانية الآن</a>
+            <a href="https://smartmoveai.streamlit.app" class="cta-secondary">جرب المنصة مباشرة</a>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <h2 class="section-title">لماذا SmartMoveAI؟</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>تقارير تحليل دقيقة</h3>
+                    <p>احصل على تقارير تحليل بيانات دقيقة وواقعية تساعدك في اتخاذ القرارات الصحيحة لشركتك</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3>أتمتة المهام</h3>
+                    <p>أتمتة المهام الروتينية لتوفير الوقت والمال وتركيز فريقك على الأعمال الاستراتيجية</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>دعم القرارات</h3>
+                    <p>اتخذ قرارات مبنية على بيانات موثوقة وتحليلات ذكية باستخدام AI متقدم</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>أمان وخصوصية</h3>
+                    <p>حلول آمنة ومتوافقة مع المعايير الأوروبية (GDPR) لحماية بيانات شركتك</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="pricing">
+        <div class="container">
+            <h2 class="section-title">اختر الخطة المناسبة لك</h2>
+            <div class="pricing-grid">
+                <!-- Free Plan -->
+                <div class="pricing-card">
+                    <h3 class="plan-name">Free</h3>
+                    <div class="price">€0<span class="price-period">/شهر</span></div>
+                    <ul class="features-list">
+                        <li>وصول محدود</li>
+                        <li>50 طلب/شهر</li>
+                        <li>تقارير أساسية</li>
+                        <li>دعم عبر البريد</li>
+                    </ul>
+                    <a href="#signup" class="cta-primary">ابدأ مجاناً</a>
+                </div>
+                
+                <!-- Premium Plan (Featured) -->
+                <div class="pricing-card featured">
+                    <h3 class="plan-name">⭐ Premium</h3>
+                    <div class="price">€19<span class="price-period">/شهر</span></div>
+                    <ul class="features-list">
+                        <li>وصول غير محدود</li>
+                        <li>تقارير كاملة ومفصلة</li>
+                        <li>أتمتة متقدمة</li>
+                        <li>تصدير PDF</li>
+                        <li>دعم أولوية</li>
+                    </ul>
+                    <a href="#signup" class="cta-primary">ترقية إلى Premium</a>
+                </div>
+                
+                <!-- Enterprise Plan -->
+                <div class="pricing-card">
+                    <h3 class="plan-name">Enterprise</h3>
+                    <div class="price" style="font-size: 1.8em;">حسب الاتفاق</div>
+                    <ul class="features-list">
+                        <li>API كاملة</li>
+                        <li>دعم مخصص 24/7</li>
+                        <li>واجهة متكاملة</li>
+                        <li>عقود SLA</li>
+                        <li>تدريب الفريق</li>
+                        <li>تخصيص كامل</li>
+                    </ul>
+                    <a href="mailto:yousef@smartmoveai.com" class="cta-secondary" style="color: #667eea; border-color: #667eea;">اطلب عرض تجريبي</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sign Up Form -->
+    <section class="signup" id="signup">
+        <div class="container">
+            <h2 class="section-title" style="color: white;">ابدأ رحلتك مع SmartMoveAI</h2>
+            <div class="signup-form">
+                <form action="#" method="POST">
+                    <div class="form-group">
+                        <label for="name">الاسم الكامل *</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">البريد الإلكتروني *</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="company">اسم الشركة (اختياري)</label>
+                        <input type="text" id="company" name="company">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="size">حجم الشركة</label>
+                        <select id="size" name="size">
+                            <option value="">-- اختر --</option>
+                            <option value="1-10">1-10 موظفين</option>
+                            <option value="11-50">11-50 موظف</option>
+                            <option value="51-200">51-200 موظف</option>
+                            <option value="201+">201+ موظف</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="plan">الخطة المطلوبة</label>
+                        <select id="plan" name="plan" required>
+                            <option value="free">Free - مجاني</option>
+                            <option value="premium">Premium - €19/شهر</option>
+                            <option value="enterprise">Enterprise - تواصل معنا</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="gdpr" name="gdpr" required>
+                            <label for="gdpr">أوافق على جمع بياناتي وفق <a href="#" style="color: #667eea;">سياسة الخصوصية</a> (GDPR)</label>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">ابدأ الآن</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trust Section -->
+    <section class="features">
+        <div class="container">
+            <h2 class="section-title">موثوق من قبل الشركات</h2>
+            <div style="text-align: center; color: #666;">
+                <p style="font-size: 1.2em; margin-bottom: 40px;">نعمل مع شركات رائدة في مختلف المجالات</p>
+                <div style="display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; opacity: 0.6;">
+                    <div style="padding: 20px 40px; background: white; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">شركة 1</div>
+                    <div style="padding: 20px 40px; background: white; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">شركة 2</div>
+                    <div style="padding: 20px 40px; background: white; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">شركة 3</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <h3 style="margin-bottom: 20px;">SmartMoveAI</h3>
+            <p>حلول ذكاء اصطناعي احترافية للشركات والمؤسسات</p>
+            <p style="margin-top: 15px;">📧 <a href="mailto:yousef@smartmoveai.com" style="color: white;">yousef@smartmoveai.com</a></p>
+            
+            <div class="footer-links">
+                <a href="#">سياسة الخصوصية</a>
+                <a href="#">شروط الاستخدام</a>
+                <a href="https://github.com/yousef-adawi/SmartMoveAI">GitHub</a>
+                <a href="https://smartmoveai.streamlit.app">المنصة</a>
+            </div>
+            
+            <p style="margin-top: 30px; opacity: 0.7;">© 2025 SmartMoveAI. جميع الحقوق محفوظة.</p>
+        </div>
+    </footer>
+</body>
+</html>
