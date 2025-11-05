@@ -44,11 +44,12 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown("<div class='main-header'><h1>🌍 SmartMoveAI</h1><h3>مساعدك الذكي للهجرة</h3></div>", unsafe_allow_html=True)
+st.markdown("<div class='main-header'><h1>🌍 SmartMoveAI</h1><h3>مساعدك الذكي للهجرة والإقامة</h3><p style='margin-top: 10px; font-size: 0.9em; opacity: 0.9;'>احصل على معلومات دقيقة وعملية - خطوات مفصلة، مستندات، تكاليف، ومواعيد</p></div>", unsafe_allow_html=True)
 
 st.markdown("""
-<div style='text-align: center; padding: 10px; background-color: #fff3cd; border-radius: 5px; margin-bottom: 20px;'>
-    💡 <b>واجهة تجريبية</b> — اسأل عن الهجرة، التأشيرات، لمّ الشمل، أو أي استفسار قانوني
+<div style='text-align: center; padding: 15px; background-color: #e8f4f8; border-radius: 10px; margin-bottom: 20px; border-right: 5px solid #2196f3;'>
+    💼 <b>للشركات:</b> نقدم حلول API وتكامل مخصص | 
+    📧 <b>تواصل:</b> <a href='mailto:yousef@smartmoveai.com' style='color: #2196f3; text-decoration: none;'>yousef@smartmoveai.com</a>
 </div>
 """, unsafe_allow_html=True)
 
@@ -223,38 +224,113 @@ if st.session_state.history:
     
     st.markdown("---")
 else:
-    # رسائل ترحيبية فقط عند البداية
-    st.info("👋 مرحباً! اسألني أي سؤال عن الهجرة، التأشيرات، أو الإجراءات القانونية")
+    # رسائل ترحيبية احترافية
+    st.markdown("""
+    <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                padding: 30px; border-radius: 15px; color: white; text-align: center; margin-bottom: 30px;'>
+        <h2 style='margin: 0; color: white;'>👋 مرحباً بك في SmartMoveAI</h2>
+        <p style='margin: 15px 0 0 0; font-size: 1.1em; opacity: 0.95;'>
+            مساعدك الذكي للحصول على معلومات دقيقة وعملية عن الهجرة والإقامة
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
     
-    # أمثلة مقترحة
-    st.markdown("### 💡 أمثلة على الأسئلة:")
+    # أسئلة سريعة مع أزرار
+    st.markdown("### 🚀 ابدأ بسؤال سريع:")
+    
+    col1, col2, col3 = st.columns(3)
+    
+    quick_questions = {
+        "🏠 لم الشمل": "كيف أقدم طلب لم شمل عائلي في هولندا؟ اشرح لي الخطوات بالتفصيل مع المستندات والتكاليف",
+        "💼 تأشيرة عمل": "ما هي خطوات الحصول على تأشيرة عمل في ألمانيا كمهندس برمجيات؟ أريد معلومات مفصلة",
+        "🎓 فيزا دراسية": "كيف أحصل على تأشيرة دراسية في هولندا؟ ما المستندات المطلوبة والتكاليف؟",
+        "⏱️ مدة المعالجة": "كم تستغرق معالجة طلب الفيزا في السفارة الهولندية؟",
+        "💰 التكاليف": "ما هي التكاليف الكاملة لطلب لم الشمل في هولندا؟",
+        "📄 المستندات": "ما المستندات المطلوبة للحصول على إقامة عمل في بلجيكا؟"
+    }
+    
+    questions_list = list(quick_questions.items())
+    
+    with col1:
+        if st.button(questions_list[0][0], use_container_width=True, key="q1"):
+            st.session_state.selected_question = questions_list[0][1]
+        if st.button(questions_list[3][0], use_container_width=True, key="q4"):
+            st.session_state.selected_question = questions_list[3][1]
+    
+    with col2:
+        if st.button(questions_list[1][0], use_container_width=True, key="q2"):
+            st.session_state.selected_question = questions_list[1][1]
+        if st.button(questions_list[4][0], use_container_width=True, key="q5"):
+            st.session_state.selected_question = questions_list[4][1]
+    
+    with col3:
+        if st.button(questions_list[2][0], use_container_width=True, key="q3"):
+            st.session_state.selected_question = questions_list[2][1]
+        if st.button(questions_list[5][0], use_container_width=True, key="q6"):
+            st.session_state.selected_question = questions_list[5][1]
+    
+    # معالجة السؤال المختار
+    if "selected_question" in st.session_state:
+        st.session_state.history.append({
+            "role": "user",
+            "content": st.session_state.selected_question
+        })
+        with st.spinner("🤔 جاري التفكير..."):
+            answer = call_openai(st.session_state.history, model)
+            st.session_state.history.append({
+                "role": "assistant",
+                "content": answer
+            })
+        del st.session_state.selected_question
+        st.rerun()
+    
+    st.markdown("---")
+    
+    # معلومات إضافية
+    st.markdown("### 📊 ماذا يمكنني أن أساعدك؟")
     
     col1, col2 = st.columns(2)
     
     with col1:
         st.markdown("""
-        - 🏠 كيف أقدم طلب لم شمل في هولندا؟
-        - 💼 ما هي شروط تأشيرة العمل؟
-        - 📄 ما المستندات المطلوبة للإقامة؟
+        **🌍 معلومات عن الدول:**
+        - هولندا 🇳🇱 | ألمانيا 🇩🇪
+        - بلجيكا 🇧🇪 | السويد 🇸🇪
+        - الدنمارك 🇩🇰
+        
+        **📋 أنواع التأشيرات:**
+        - تأشيرات العمل والدراسة
+        - لم الشمل العائلي
+        - طلبات اللجوء
         """)
     
     with col2:
         st.markdown("""
-        - ⏱️ كم يستغرق معالجة طلب الفيزا؟
-        - 💰 ما هي تكاليف طلب اللجوء؟
-        - 🎓 كيف أحصل على فيزا دراسية؟
+        **💡 نقدم لك:**
+        - ✅ خطوات مفصلة وعملية
+        - ✅ قوائم المستندات المطلوبة
+        - ✅ التكاليف والمدد الزمنية
+        - ✅ نصائح من خبراء
+        - ✅ روابط رسمية موثوقة
         """)
     
     st.markdown("---")
 
 # --- نموذج الإدخال (دائماً في الأسفل) ---
-st.markdown("### ✍️ اكتب سؤالك:")
+st.markdown("### ✍️ أو اكتب سؤالك الخاص:")
+
+# القيمة الافتراضية للنص
+default_text = ""
+if "prefill_question" in st.session_state:
+    default_text = st.session_state.prefill_question
+    del st.session_state.prefill_question
 
 with st.form("user_input", clear_on_submit=True):
     user_text = st.text_area(
         "اكتب سؤالك هنا",
         height=100,
-        placeholder="مثال: كيف أقدم طلب لم شمل في هولندا؟",
+        value=default_text,
+        placeholder="مثال: أريد معلومات مفصلة عن لم الشمل في هولندا - الخطوات، المستندات، التكاليف، والمدة الزمنية",
         label_visibility="collapsed"
     )
     
