@@ -16,30 +16,43 @@ st.markdown("""
 <style>
     .main-header {
         text-align: center;
-        color: #1f77b4;
-        padding: 20px;
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-        border-radius: 10px;
+        padding: 25px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 15px;
         color: white;
         margin-bottom: 20px;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
     }
     .user-message {
         background-color: #e3f2fd;
-        padding: 15px;
-        border-radius: 10px;
-        margin: 10px 0;
-        border-left: 4px solid #2196f3;
+        padding: 20px;
+        border-radius: 12px;
+        margin: 15px 0;
+        border-right: 5px solid #2196f3;
+        font-size: 1.1em;
+        color: #000;
+        font-weight: 500;
     }
     .assistant-message {
         background-color: #f1f8e9;
-        padding: 15px;
-        border-radius: 10px;
-        margin: 10px 0;
-        border-left: 4px solid #4caf50;
+        padding: 20px;
+        border-radius: 12px;
+        margin: 15px 0;
+        border-right: 5px solid #4caf50;
+        font-size: 1.05em;
+        color: #000;
+        line-height: 1.8;
     }
-    /* إخفاء زر الـ form الافتراضي */
-    .stForm {
-        border: none;
+    /* جعل النص أكثر وضوحاً */
+    .stTextArea textarea {
+        font-size: 1.1em !important;
+        color: #000 !important;
+        font-weight: 500 !important;
+    }
+    /* تحسين الأزرار */
+    .stButton button {
+        font-weight: 600 !important;
+        font-size: 1.05em !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -79,14 +92,28 @@ with st.sidebar:
     
     # تركيز البلد
     country_focus = st.selectbox(
-        "🌍 تركيز البلد",
+        "🌍 اختر الدولة",
         [
-            "Netherlands 🇳🇱",
-            "Germany 🇩🇪",
-            "Belgium 🇧🇪",
-            "Sweden 🇸🇪",
-            "Denmark 🇩🇰",
-            "Global - متعدد الدول 🌐"
+            "🌐 Global - جميع الدول",
+            "🇳🇱 Netherlands - هولندا",
+            "🇩🇪 Germany - ألمانيا",
+            "🇧🇪 Belgium - بلجيكا",
+            "🇸🇪 Sweden - السويد",
+            "🇩🇰 Denmark - الدنمارك",
+            "🇨🇦 Canada - كندا",
+            "🇦🇺 Australia - أستراليا",
+            "🇺🇸 USA - أمريكا",
+            "🇬🇧 UK - بريطانيا",
+            "🇫🇷 France - فرنسا",
+            "🇮🇹 Italy - إيطاليا",
+            "🇪🇸 Spain - إسبانيا",
+            "🇦🇪 UAE - الإمارات",
+            "🇸🇦 Saudi Arabia - السعودية",
+            "🇶🇦 Qatar - قطر",
+            "🇳🇿 New Zealand - نيوزيلندا",
+            "🇸🇬 Singapore - سنغافورة",
+            "🇯🇵 Japan - اليابان",
+            "🇰🇷 South Korea - كوريا الجنوبية"
         ],
         index=0
     )
@@ -121,14 +148,31 @@ if "history" not in st.session_state:
 def call_openai(messages: List[Dict[str, str]], model_name: str) -> str:
     """استدعاء OpenAI API بالطريقة الجديدة"""
     try:
+        # استخراج اسم الدولة من الاختيار
+        country_name = country_focus.split(" - ")[1] if " - " in country_focus else "any country"
+        country_emoji = country_focus.split(" ")[0] if country_focus else "🌐"
+        
         # بناء system prompt ديناميكي
         country_context = ""
-        if "Netherlands" in country_focus:
+        if "Netherlands" in country_focus or "هولندا" in country_focus:
             country_context = "Focus on Netherlands (هولندا) immigration procedures, IND requirements, and Dutch law."
-        elif "Germany" in country_focus:
+        elif "Germany" in country_focus or "ألمانيا" in country_focus:
             country_context = "Focus on Germany immigration, Ausländerbehörde procedures, and German law."
-        elif "Global" in country_focus:
-            country_context = "Provide general immigration guidance applicable to multiple countries."
+        elif "Canada" in country_focus or "كندا" in country_focus:
+            country_context = "Focus on Canada immigration, Express Entry, PNP programs, and IRCC procedures."
+        elif "Australia" in country_focus or "أستراليا" in country_focus:
+            country_context = "Focus on Australia immigration, SkillSelect, visa subclasses, and Department of Home Affairs."
+        elif "USA" in country_focus or "أمريكا" in country_focus:
+            country_context = "Focus on USA immigration, USCIS procedures, green card, and visa categories."
+        elif "UK" in country_focus or "بريطانيا" in country_focus:
+            country_context = "Focus on UK immigration, Home Office procedures, and UK visa routes."
+        elif "UAE" in country_focus or "الإمارات" in country_focus:
+            country_context = "Focus on UAE immigration, residence visa, work permits, and GDRFA procedures."
+        elif "Global" in country_focus or "جميع" in country_focus:
+            country_context = f"Provide general immigration guidance. If the user asks about a specific country, focus on that country's procedures."
+        else:
+            # أي دولة أخرى - ديناميكي
+            country_context = f"Focus on {country_name} immigration procedures, official requirements, and local laws. Provide accurate information specific to this country."
         
         language_context = ""
         if "العربية" in language:
@@ -140,7 +184,7 @@ def call_openai(messages: List[Dict[str, str]], model_name: str) -> str:
         
         system_message = {
             "role": "system",
-            "content": f"""You are SmartMoveAI, an expert Migration Advisor providing PRACTICAL, ACTIONABLE guidance.
+            "content": f"""You are SmartMoveAI, an expert Migration Advisor providing PRACTICAL, ACTIONABLE guidance for immigration worldwide.
 
 CRITICAL INSTRUCTIONS:
 1. Give SPECIFIC, DETAILED step-by-step instructions
@@ -148,6 +192,7 @@ CRITICAL INSTRUCTIONS:
 3. Provide REALISTIC timelines and costs
 4. Give PRACTICAL examples and scenarios
 5. NEVER just give links - explain the full process
+6. Adapt your answer to the specific country asked about
 
 {country_context}
 {language_context}
@@ -164,7 +209,7 @@ RESPONSE FORMAT (ALWAYS follow this):
 • [وثيقة محددة + كيفية الحصول عليها]
 
 💰 **التكاليف المتوقعة:**
-• [تكلفة محددة بالأرقام]
+• [تكلفة محددة بالأرقام والعملة المحلية]
 
 ⏰ **المدة الزمنية:**
 • [مدة محددة بالأيام/أسابيع/شهور]
@@ -176,13 +221,16 @@ RESPONSE FORMAT (ALWAYS follow this):
 • [رابط + شرح مختصر لما يحتويه]
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-EXAMPLES OF GOOD VS BAD ANSWERS:
+EXAMPLES OF GOOD ANSWERS:
 
-❌ BAD: "يمكنك زيارة موقع IND للمزيد من المعلومات."
-✅ GOOD: "قدّم طلب لم الشمل عبر تعبئة نموذج MVV (Machtiging tot Voorlopig Verblijf) من موقع IND. ستحتاج: جواز سفر ساري، شهادة زواج مترجمة ومصدّقة، إثبات دخل شهري لا يقل عن €1,900، وعقد إيجار. التكلفة: €350 للطلب + €80 رسوم بصمة. المدة: 3-6 أشهر."
+For Netherlands:
+"قدّم طلب MVV عبر موقع IND. ستحتاج: جواز سفر ساري، شهادة زواج مترجمة، إثبات دخل €1,900/شهر، عقد إيجار. التكلفة: €350 طلب + €80 بصمة. المدة: 3-6 أشهر."
 
-❌ BAD: "هناك عدة أنواع من التأشيرات."
-✅ GOOD: "للعمل في ألمانيا كمهندس برمجيات، تحتاج تأشيرة Blue Card EU. الشروط: شهادة جامعية معترف بها، عرض عمل براتب سنوي لا يقل عن €43,800 (€56,400 للمهن غير النقص). قدّم الطلب في السفارة الألمانية بعد تثبيت موعد عبر موقعهم. المستندات: شهادة الجامعة مصدقة، عقد العمل، CV، جواز سفر، صور شخصية. المدة: 4-12 أسبوع. التكلفة: €75."
+For Canada:
+"قدّم عبر Express Entry. احسب نقاطك في CRS (67 نقطة حد أدنى). ستحتاج: IELTS، تقييم شهادة ECA، خبرة عمل موثقة. التكلفة: $1,365 CAD. المدة: 6 أشهر."
+
+For UAE:
+"صاحب العمل يقدم الطلب عبر GDRFA. ستحتاج: جواز سفر ساري 6 أشهر، شهادة جامعية مصدقة من الخارجية، فحص طبي. التكلفة: 3,000-5,000 درهم. المدة: 2-4 أسابيع."
 
 ALWAYS be specific, practical, and helpful. Never be vague."""
         }
@@ -191,7 +239,7 @@ ALWAYS be specific, practical, and helpful. Never be vague."""
         response = client.chat.completions.create(
             model=model_name,
             messages=[system_message] + messages,
-            max_tokens=1200,
+            max_tokens=1500,
             temperature=0.3,
         )
         
@@ -224,113 +272,59 @@ if st.session_state.history:
     
     st.markdown("---")
 else:
-    # رسائل ترحيبية احترافية
+    # واجهة بسيطة وواضحة
     st.markdown("""
     <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                padding: 30px; border-radius: 15px; color: white; text-align: center; margin-bottom: 30px;'>
-        <h2 style='margin: 0; color: white;'>👋 مرحباً بك في SmartMoveAI</h2>
-        <p style='margin: 15px 0 0 0; font-size: 1.1em; opacity: 0.95;'>
-            مساعدك الذكي للحصول على معلومات دقيقة وعملية عن الهجرة والإقامة
+                padding: 40px; border-radius: 15px; color: white; text-align: center; margin-bottom: 30px;'>
+        <h2 style='margin: 0; color: white; font-size: 2em;'>👋 مرحباً بك في SmartMoveAI</h2>
+        <p style='margin: 20px 0 0 0; font-size: 1.3em; font-weight: 500;'>
+            احصل على معلومات دقيقة ومفصلة عن الهجرة والإقامة
         </p>
     </div>
     """, unsafe_allow_html=True)
     
-    # أسئلة سريعة مع أزرار
-    st.markdown("### 🚀 ابدأ بسؤال سريع:")
-    
-    col1, col2, col3 = st.columns(3)
-    
-    quick_questions = {
-        "🏠 لم الشمل": "كيف أقدم طلب لم شمل عائلي في هولندا؟ اشرح لي الخطوات بالتفصيل مع المستندات والتكاليف",
-        "💼 تأشيرة عمل": "ما هي خطوات الحصول على تأشيرة عمل في ألمانيا كمهندس برمجيات؟ أريد معلومات مفصلة",
-        "🎓 فيزا دراسية": "كيف أحصل على تأشيرة دراسية في هولندا؟ ما المستندات المطلوبة والتكاليف؟",
-        "⏱️ مدة المعالجة": "كم تستغرق معالجة طلب الفيزا في السفارة الهولندية؟",
-        "💰 التكاليف": "ما هي التكاليف الكاملة لطلب لم الشمل في هولندا؟",
-        "📄 المستندات": "ما المستندات المطلوبة للحصول على إقامة عمل في بلجيكا؟"
-    }
-    
-    questions_list = list(quick_questions.items())
-    
-    with col1:
-        if st.button(questions_list[0][0], use_container_width=True, key="q1"):
-            st.session_state.selected_question = questions_list[0][1]
-        if st.button(questions_list[3][0], use_container_width=True, key="q4"):
-            st.session_state.selected_question = questions_list[3][1]
-    
-    with col2:
-        if st.button(questions_list[1][0], use_container_width=True, key="q2"):
-            st.session_state.selected_question = questions_list[1][1]
-        if st.button(questions_list[4][0], use_container_width=True, key="q5"):
-            st.session_state.selected_question = questions_list[4][1]
-    
-    with col3:
-        if st.button(questions_list[2][0], use_container_width=True, key="q3"):
-            st.session_state.selected_question = questions_list[2][1]
-        if st.button(questions_list[5][0], use_container_width=True, key="q6"):
-            st.session_state.selected_question = questions_list[5][1]
-    
-    # معالجة السؤال المختار
-    if "selected_question" in st.session_state:
-        st.session_state.history.append({
-            "role": "user",
-            "content": st.session_state.selected_question
-        })
-        with st.spinner("🤔 جاري التفكير..."):
-            answer = call_openai(st.session_state.history, model)
-            st.session_state.history.append({
-                "role": "assistant",
-                "content": answer
-            })
-        del st.session_state.selected_question
-        st.rerun()
-    
-    st.markdown("---")
-    
-    # معلومات إضافية
-    st.markdown("### 📊 ماذا يمكنني أن أساعدك؟")
-    
+    # معلومات واضحة بدون تعقيد
     col1, col2 = st.columns(2)
     
     with col1:
         st.markdown("""
-        **🌍 معلومات عن الدول:**
-        - هولندا 🇳🇱 | ألمانيا 🇩🇪
-        - بلجيكا 🇧🇪 | السويد 🇸🇪
-        - الدنمارك 🇩🇰
-        
-        **📋 أنواع التأشيرات:**
-        - تأشيرات العمل والدراسة
-        - لم الشمل العائلي
-        - طلبات اللجوء
-        """)
+        <div style='background: white; padding: 25px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);'>
+            <h3 style='color: #667eea; margin-top: 0;'>🌍 دول مدعومة</h3>
+            <p style='font-size: 1em; line-height: 1.6; color: #333;'>
+                🇳🇱 هولندا | 🇩🇪 ألمانيا | 🇧🇪 بلجيكا<br>
+                🇸🇪 السويد | 🇩🇰 الدنمارك<br>
+                🇨🇦 كندا | 🇦🇺 أستراليا | 🇺🇸 أمريكا<br>
+                🇬🇧 بريطانيا | 🇫🇷 فرنسا | 🇮🇹 إيطاليا<br>
+                🇦🇪 الإمارات | 🇸🇦 السعودية | 🇶🇦 قطر<br>
+                <b style='color: #667eea;'>+ أي دولة أخرى!</b>
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
     
     with col2:
         st.markdown("""
-        **💡 نقدم لك:**
-        - ✅ خطوات مفصلة وعملية
-        - ✅ قوائم المستندات المطلوبة
-        - ✅ التكاليف والمدد الزمنية
-        - ✅ نصائح من خبراء
-        - ✅ روابط رسمية موثوقة
-        """)
+        <div style='background: white; padding: 25px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);'>
+            <h3 style='color: #667eea; margin-top: 0;'>💼 ما نقدمه</h3>
+            <p style='font-size: 1.1em; line-height: 1.8; color: #333;'>
+                ✅ خطوات مفصلة وعملية<br>
+                ✅ المستندات المطلوبة<br>
+                ✅ التكاليف الدقيقة<br>
+                ✅ المدد الزمنية<br>
+                ✅ روابط رسمية
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
     
-    st.markdown("---")
+    st.markdown("<br>", unsafe_allow_html=True)
 
 # --- نموذج الإدخال (دائماً في الأسفل) ---
-st.markdown("### ✍️ أو اكتب سؤالك الخاص:")
-
-# القيمة الافتراضية للنص
-default_text = ""
-if "prefill_question" in st.session_state:
-    default_text = st.session_state.prefill_question
-    del st.session_state.prefill_question
+st.markdown("### ✍️ اكتب سؤالك:")
 
 with st.form("user_input", clear_on_submit=True):
     user_text = st.text_area(
-        "اكتب سؤالك هنا",
-        height=100,
-        value=default_text,
-        placeholder="مثال: أريد معلومات مفصلة عن لم الشمل في هولندا - الخطوات، المستندات، التكاليف، والمدة الزمنية",
+        "سؤالك",
+        height=120,
+        placeholder="إلى أين تريد الهجرة؟ اسألني عن أي دولة...",
         label_visibility="collapsed"
     )
     
