@@ -3,6 +3,18 @@ from openai import OpenAI
 from typing import List, Dict
 import os
 
+# استيراد تكامل Stripe
+try:
+    from stripe_integration import (
+        init_stripe, 
+        check_question_limit, 
+        display_subscription_status,
+        handle_payment_callback
+    )
+    STRIPE_ENABLED = True
+except:
+    STRIPE_ENABLED = False
+
 # --- إعداد الصفحة ---
 st.set_page_config(
     page_title="SmartMoveAI — Migration Advisor",
@@ -10,6 +22,10 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+# معالجة callbacks من Stripe في بداية التطبيق
+if STRIPE_ENABLED:
+    handle_payment_callback()
 
 # --- تصميم مخصص ---
 st.markdown("""
@@ -69,6 +85,17 @@ st.markdown("""
 # --- الإعدادات الجانبية ---
 with st.sidebar:
     st.header("⚙️ الإعدادات")
+    
+    # معالجة callbacks من Stripe وعرض حالة الاشتراك
+    if STRIPE_ENABLED:
+        if 'user_email' in st.session_state:
+            display_subscription_status(st.session_state.get('user_email'))
+        else:
+            # عرض معلومات Free plan
+            st.info("🆓 **Free Plan**\n\n10 أسئلة/شهر")
+            if st.button("💎 ترقية"):
+                st.switch_page("pages/Pricing.py")
+        st.markdown("---")
     
     # قراءة مفتاح OpenAI
     openai_api_key = st.secrets.get("OPENAI_API_KEY") or os.getenv("OPENAI_API_KEY")
@@ -354,6 +381,34 @@ if clear_btn:
 
 # --- معالجة الإرسال ---
 if submitted and user_text.strip():
+    # التحقق من حد الأسئلة
+    if STRIPE_ENABLED:
+        is_allowed, remaining, limit, is_premium = check_question_limit(
+            st.session_state.get('user_email', None)
+        )
+        
+        if not is_allowed:
+            st.error(f"""
+            ⚠️ **وصلت للحد الأقصى من الأسئلة!**
+            
+            لقد استخدمت {limit} أسئلة من أصل {limit} في الخطة المجانية.
+            """)
+            
+            st.info("""
+            💎 **اشترك في Premium للحصول على:**
+            - ✅ أسئلة غير محدودة
+            - ✅ كل الدول (20+)
+            - ✅ تصدير PDF
+            - ✅ دعم أولوية 24/7
+            
+            **السعر: €19.99/شهر فقط**
+            """)
+            
+            if st.button("💎 اشترك الآن", type="primary"):
+                st.switch_page("pages/Pricing.py")
+            
+            st.stop()
+    
     # إضافة سؤال المستخدم
     st.session_state.history.append({
         "role": "user",

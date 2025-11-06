@@ -1,7 +1,7 @@
 import streamlit as st
-from openai import OpenAI
-from typing import List, Dict
-import os
+import sys
+sys.path.append('..')
+from stripe_integration import init_stripe, create_checkout_session
 
 # --- إعداد الصفحة ---
 st.set_page_config(
@@ -9,6 +9,9 @@ st.set_page_config(
     page_icon="💎",
     layout="wide"
 )
+
+# تهيئة Stripe
+init_stripe()
 
 # --- تصميم مخصص ---
 st.markdown("""
@@ -302,23 +305,60 @@ with st.form("premium_subscription"):
         elif not agree_terms:
             st.error("⚠️ يجب الموافقة على الشروط والأحكام")
         else:
-            # هنا سيتم التكامل مع Stripe
-            st.success(f"""
-            ✅ تم استلام طلبك يا {name}!
+            # تحديد Price ID حسب الخطة
+            if "شهري" in plan_duration:
+                price_id = st.secrets["PRICE_ID_PREMIUM"]
+            else:
+                # للسنوي - إذا كان موجود
+                price_id = st.secrets.get("PRICE_ID_PREMIUM_ANNUAL", st.secrets["PRICE_ID_PREMIUM"])
             
-            📧 سنرسل لك رابط الدفع الآمن عبر Stripe إلى: {email}
+            # إنشاء جلسة دفع
+            with st.spinner("🔄 جاري إنشاء جلسة الدفع..."):
+                checkout_url = create_checkout_session(
+                    price_id=price_id,
+                    customer_email=email,
+                    customer_name=name
+                )
             
-            💎 الخطة: {plan_duration}
-            
-            ⏰ يرجى التحقق من بريدك الإلكتروني خلال 5 دقائق.
-            """)
-            
-            st.info("""
-            🔒 **الدفع آمن 100%**
-            - معالج عبر Stripe (منصة عالمية موثوقة)
-            - بياناتك محمية ومشفرة
-            - لا نحفظ معلومات بطاقتك
-            """)
+            if checkout_url:
+                st.success(f"✅ تم إنشاء جلسة الدفع يا {name}!")
+                
+                # عرض الرابط بشكل واضح
+                st.markdown(f"""
+                ### 💳 انقر على الزر أدناه للمتابعة للدفع الآمن:
+                """)
+                
+                st.link_button(
+                    "💳 الدفع عبر Stripe (آمن 100%)",
+                    checkout_url,
+                    use_container_width=True,
+                    type="primary"
+                )
+                
+                st.info("""
+                🔒 **الدفع آمن 100%**
+                - معالج عبر Stripe (منصة عالمية موثوقة)
+                - بياناتك محمية ومشفرة بـ SSL
+                - لا نحفظ معلومات بطاقتك
+                - يمكنك الإلغاء في أي وقت
+                """)
+                
+                st.markdown(f"""
+                📧 **ما التالي؟**
+                1. ستُوجّه لصفحة دفع Stripe الآمنة
+                2. أدخل معلومات البطاقة
+                3. بعد الدفع، ستعود للتطبيق تلقائياً
+                4. ستُرسل فاتورة إلى: **{email}**
+                """)
+            else:
+                st.error("""
+                ❌ عذراً، حدث خطأ في إنشاء جلسة الدفع.
+                
+                الرجاء:
+                - التحقق من اتصالك بالإنترنت
+                - المحاولة مرة أخرى
+                - أو التواصل معنا: yousef@smartmoveai.com
+                """)
 
 # --- Testimonials ---
 st.markdown("---")
