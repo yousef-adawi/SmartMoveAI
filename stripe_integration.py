@@ -14,10 +14,12 @@ from datetime import datetime, timedelta
 def init_stripe():
     """تهيئة Stripe بالمفتاح السري"""
     try:
+        if "STRIPE_SECRET_KEY" not in st.secrets:
+            return False
         stripe.api_key = st.secrets["STRIPE_SECRET_KEY"]
         return True
     except Exception as e:
-        st.error(f"❌ خطأ في تهيئة Stripe: {e}")
+        st.sidebar.warning(f"⚠️ Stripe غير مفعّل")
         return False
 
 
@@ -240,8 +242,7 @@ def display_subscription_status(user_email: str):
         if remaining <= 3:
             st.sidebar.error(f"⚠️ بقي {remaining} أسئلة فقط!")
         
-        if st.sidebar.button("💎 ترقية إلى Premium"):
-            st.switch_page("pages/Pricing.py")
+        st.sidebar.markdown("[💎 ترقية إلى Premium](/Pricing)", unsafe_allow_html=True)
 
 
 # ════════════════════════════════════════════════════════════════

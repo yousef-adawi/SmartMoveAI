@@ -93,8 +93,7 @@ with st.sidebar:
         else:
             # عرض معلومات Free plan
             st.info("🆓 **Free Plan**\n\n10 أسئلة/شهر")
-            if st.button("💎 ترقية"):
-                st.switch_page("pages/Pricing.py")
+            st.markdown("[💎 اشترك في Premium](/Pricing)", unsafe_allow_html=True)
         st.markdown("---")
     
     # قراءة مفتاح OpenAI
@@ -404,8 +403,20 @@ if submitted and user_text.strip():
             **السعر: €19.99/شهر فقط**
             """)
             
-            if st.button("💎 اشترك الآن", type="primary"):
-                st.switch_page("pages/Pricing.py")
+            st.markdown("""
+            <div style='text-align: center; margin: 20px 0;'>
+                <a href='/Pricing' target='_self' style='
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    padding: 15px 40px;
+                    border-radius: 50px;
+                    text-decoration: none;
+                    font-weight: bold;
+                    font-size: 1.1em;
+                    display: inline-block;
+                '>💎 اشترك الآن</a>
+            </div>
+            """, unsafe_allow_html=True)
             
             st.stop()
     
